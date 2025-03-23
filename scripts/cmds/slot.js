@@ -15,6 +15,7 @@ module.exports = {
   langs: {
     en: {
       invalid_amount: "Enter a valid and positive amount to have a chance to win double.",
+      limit_amount : "Minimum bet amount is 10k",
       not_enough_money: "Check your balance to ensure you have that amount.",
       spin_message: "Spinning...",
       win_message: "You won $%1, buddy!",
@@ -27,8 +28,8 @@ module.exports = {
     const userData = await usersData.get(senderID);
     const amount = parseInt(args[0]);
 
-    if (isNaN(amount) || amount <= 0) {
-      return message.reply(getLang("invalid_amount"));
+    if (isNaN(amount) || amount <= 10000) {
+      return message.reply(getLang("limit_amount"));
     }
 
     if (amount > userData.money) {

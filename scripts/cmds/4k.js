@@ -1,50 +1,44 @@
-const axios = require('axios');
-const tinyurl = require('tinyurl');
+const axios = require("axios");
 
-module.exports = {
-  config: {
+module.exports.config = {
     name: "4k",
-    aliases: ["4k", "remini"],
+    aliases: ["enhance", "remini"],
     version: "1.0",
-    author: "JARiF",
-    countDown: 15,
+    author: "♡︎ 𝐻𝐴𝑆𝐴𝑁 ♡︎",
+    countDown: 3, 
     role: 0,
-    longDescription: "Upscale your image.",
-    category: "image",
+    longDescription: {
+        en: "enhanced your images"
+    },
+    category: "enhanced",
     guide: {
-      en: "{pn} reply to an image"
-    }
-  },
+        en: "{pn} reply to an image for enhance"
+    } 
+};
 
-  onStart: async function ({ message, args, event, api }) {
-    const getImageUrl = () => {
-      if (event.type === "message_reply") {
-        const replyAttachment = event.messageReply.attachments[0];
-        if (["photo", "sticker"].includes(replyAttachment?.type)) {
-          return replyAttachment.url;
-        } else {
-          throw new Error("");
-        }
-      } else if (args[0]?.match(/(https?:\/\/.*\.(?:png|jpg|jpeg))/g) || null) {
-        return args[0];
-      } else {
-        throw new Error("(⁠┌⁠・⁠。⁠・⁠)⁠┌ | Reply to an image.");
-      }
-    };
-
+module.exports.onStart = async ({ api, event, args }) => {
     try {
-      const imageUrl = await getImageUrl();
-      const shortUrl = await tinyurl.shorten(imageUrl);
+        if (!event.messageReply || !event.messageReply.attachments || !event.messageReply.attachments[0]) {
+            return api.sendMessage("𝐏𝐥𝐞𝐚𝐬𝐞 𝐫𝐞𝐩𝐥𝐲 𝐭𝐨 𝐚𝐧 𝐢𝐦𝐚𝐠𝐞 𝐰𝐢𝐭𝐡 𝐭𝐡𝐞 𝐜𝐨𝐦𝐦𝐚𝐧𝐝.", event.threadID, event.messageID);
+        }
 
-      message.reply("⏰ | ℙ𝕝𝕖𝕒𝕤𝕖 𝕨𝕒𝕚𝕥...");
+        const hasan = event.messageReply.attachments[0].url;
+        
+        api.setMessageReaction("✨", event.messageID, () => {}, true);
+        const apiUrl = `https://hasan-4k-image-api.onrender.com/enhance?imageUrl=${encodeURIComponent(hasan)}`};
 
-      const response = await axios.get(`https://www.api.vyturex.com/upscale?imageUrl=${shortUrl}`);
-      const resultUrl = response.data.resultUrl;
+        const response = await axios.get(apiUrl, {
+            responseType: 'stream'
+        });
+       
+        api.setMessageReaction("😍", event.messageID, () => {}, true);
 
-      message.reply({ body: "✅ | 𝕀𝕞𝕒𝕘𝕖 𝔼𝕟𝕙𝕒𝕟𝕔𝕖𝕕📷.", attachment: await global.utils.getStreamFromURL(resultUrl) });
-    } catch (error) {
-      message.reply("🥲 | 𝔼𝕣𝕣𝕠𝕣: " + error.message);
-      // Log error for debugging: console.error(error);
+        api.sendMessage({
+            body: "✨| 𝐇𝐞𝐫𝐞 𝐢𝐬 𝐲𝐨𝐮𝐫 𝐞𝐧𝐡𝐚𝐧𝐜𝐞𝐝 𝐩𝐡𝐨𝐭𝐨",
+            attachment: response.data
+        }, event.threadID, event.messageID);
+
+    } catch (e) {
+        api.sendMessage(Error: ${e.message}, event.threadID, event.messageID);
     }
-  }
 };
